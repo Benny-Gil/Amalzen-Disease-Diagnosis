@@ -3,18 +3,20 @@
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_parameters)).
 :- use_module(library(http/http_json)).
+:- use_module(library(http/http_cors)).  % Import CORS library
 :- use_module(logic).  % Import diagnosis logic
 
 % Define HTTP handlers
 :- http_handler(root(diagnose), diagnose_handler, []).
 
-% Start the HTTP server on port 8080
+% Start the HTTP server on port 8090
 start_server :-
     http_server(http_dispatch, [port(8090)]),
     format('Server started at http://localhost:8090/~n').
 
 % Handle /diagnose?symptoms=symptom1,symptom2
 diagnose_handler(Request) :-
+    cors_enable(Request, [methods([get])]),  % Enable CORS for GET requests
     (   http_parameters(Request, [
             symptoms(SymptomListStr, [optional(true), default("")])
         ])
@@ -24,3 +26,7 @@ diagnose_handler(Request) :-
         reply_json(Diseases)
     ;   reply_json(json{error: "Invalid parameters"})
     ).
+
+% Enable CORS for all responses
+:- multifile http:access_control_allow_origin/2.
+http:access_control_allow_origin(_, '*').
