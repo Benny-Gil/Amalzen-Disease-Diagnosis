@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Diagnosis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Disease Diagnosis</h1>
+        <label for="symptoms">Enter Symptoms (comma-separated):</label>
+        <input type="text" id="symptoms" placeholder="e.g., fever, cough">
+        <button onclick="diagnose()">Diagnose</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        async function diagnose() {
+            const symptoms = document.getElementById('symptoms').value;
+            const response = await fetch(`http://localhost:8080/diagnose?symptoms=${encodeURIComponent(symptoms)}`);
+            const result = await response.json();
+            document.getElementById('result').innerText = JSON.stringify(result, null, 2);
+        }
+    </script>
+</body>
+</html>
