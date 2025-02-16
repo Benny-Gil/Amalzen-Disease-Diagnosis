@@ -5,7 +5,7 @@
 
 % Main function
 main :-
-    writeln('Disease Diagnosis System'),
+    writeln('\nDisease Diagnosis System'),
     writeln('1. Interactive Mode'),
     writeln('2. Start Web Server'),
     writeln('3. Exit'),
@@ -25,7 +25,8 @@ handle_choice(_) :-
 
 % Interactive diagnosis mode
 interactive_mode :-
-    writeln('Enter symptoms separated by commas (e.g., fever,cough,sore_throat):'),
+    read_line_to_string(user_input, _),
+    writeln('\nEnter symptoms separated by commas (e.g., fever,cough,sore_throat):'),
     read_line_to_string(user_input, Input),
     split_string(Input, ",", " ", SymptomStrings),
     maplist(atom_string, Symptoms, SymptomStrings),

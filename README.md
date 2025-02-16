@@ -39,14 +39,18 @@ You can run the program using either the CLI or the web interface.
     3. Exit
     ```
 
-5. If you choose interactive mode Type "1. " and your symptom/s:
+5. If you choose interactive mode Type "1." and your symptom/s:
     ```prolog
+    > swipl main.pl
+
     Disease Diagnosis System
     1. Interactive Mode
     2. Start Web Server
     3. Exit
-    |: 1. fever
+    |: 1.
+
     Enter symptoms separated by commas (e.g., fever,cough,sore_throat):
+    |: fever
     Possible diseases: [dengue_fever,mpox,covid19,measles,malaria]
     ```
 
