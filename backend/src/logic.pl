@@ -12,3 +12,9 @@ diagnose(Symptoms, Disease) :-
 all_symptoms(SortedSymptoms) :-
     findall(Symptom, (disease(Disease), has_symptoms(Disease, Symptoms), member(Symptom, Symptoms)), SymptomList),
     sort(SymptomList, SortedSymptoms).
+
+% Rule: Find diseases not matching the given symptoms
+not_possible_disease(Symptoms, Disease) :-
+    disease(Disease),
+    has_symptoms(Disease, DiseaseSymptoms),
+    \+ subset(Symptoms, DiseaseSymptoms).
