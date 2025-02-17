@@ -12,6 +12,7 @@
 
 % Define HTTP handlers
 :- http_handler(root(diagnose), diagnose_handler, []).
+:- http_handler(root(symptoms), symptoms_handler, []).
 
 % Start the HTTP server on port 8090
 start_server :-
@@ -30,6 +31,12 @@ diagnose_handler(Request) :-
         reply_json(Diseases)
     ;   reply_json(json{error: "Invalid parameters"})
     ).
+
+% Handle /symptoms to get the list of all symptoms
+symptoms_handler(_) :-
+    cors_enable,
+    all_symptoms(SortedSymptoms),
+    reply_json(SortedSymptoms).
 
 % Enable CORS for all responses
 :- multifile http:access_control_allow_origin/2.
