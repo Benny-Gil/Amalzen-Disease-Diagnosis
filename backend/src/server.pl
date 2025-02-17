@@ -6,6 +6,10 @@
 :- use_module(library(http/http_cors)).  % Import CORS library
 :- use_module(logic).  % Import diagnosis logic
 
+% Set CORS setting to allow all origins
+:- set_setting(http:cors, [*]).
+
+
 % Define HTTP handlers
 :- http_handler(root(diagnose), diagnose_handler, []).
 

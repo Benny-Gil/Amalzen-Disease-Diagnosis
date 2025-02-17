@@ -26,27 +26,34 @@
             width: 100%;
             overflow: auto;
         }
-        iframe {
-            border: none;
-            width: 100%;
-            height: 100%;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Disease Diagnosis</h1>
-        <form action="http://localhost:8090/diagnose" method="get" target="result-frame">
+        <form id="diagnosis-form">
             <label for="symptoms">Enter Symptoms (comma-separated):</label>
             <input type="text" id="symptoms" name="symptoms" placeholder="e.g., fever, cough">
             <button type="submit">Diagnose</button>
         </form>
         <div class="result-section">
             <h2>Diagnosis Results</h2>
-            <div class="result">
-                <iframe id="result-frame" name="result-frame"></iframe>
-            </div>
+            <div class="result" id="result"></div>
         </div>
     </div>
+    <script>
+        document.getElementById('diagnosis-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const symptoms = document.getElementById('symptoms').value;
+            const response = await fetch(`http://localhost:8090/diagnose?symptoms=${symptoms}`);
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            if (data.error) {
+                resultDiv.textContent = data.error;
+            } else {
+                resultDiv.innerHTML = `<ul>${data.map(disease => `<li>${disease}</li>`).join('')}</ul>`;
+            }
+        });
+    </script>
 </body>
 </html>
