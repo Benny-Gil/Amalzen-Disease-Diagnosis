@@ -5,4 +5,5 @@
 % Diagnosis rule: Find diseases matching all given symptoms
 diagnose(Symptoms, Disease) :-
     disease(Disease),
-    forall(member(Symptom, Symptoms), has_symptom(Disease, Symptom)).
+    has_symptoms(Disease, DiseaseSymptoms),
+    subset(Symptoms, DiseaseSymptoms).
