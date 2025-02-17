@@ -1,4 +1,4 @@
-:- module(logic, [diagnose/2]).
+:- module(logic, [diagnose/2, all_symptoms/1]).
 
 :- use_module(knowledge).  % Import the knowledge base
 
@@ -7,3 +7,8 @@ diagnose(Symptoms, Disease) :-
     disease(Disease),
     has_symptoms(Disease, DiseaseSymptoms),
     subset(Symptoms, DiseaseSymptoms).
+
+% Retrieve all unique symptoms from the knowledge base
+all_symptoms(SortedSymptoms) :-
+    findall(Symptom, (disease(Disease), has_symptoms(Disease, Symptoms), member(Symptom, Symptoms)), SymptomList),
+    sort(SymptomList, SortedSymptoms).

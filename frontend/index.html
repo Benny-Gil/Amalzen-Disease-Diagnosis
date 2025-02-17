@@ -13,7 +13,7 @@
             max-width: 600px;
             margin: auto;
         }
-        input, button {
+        input, button, select {
             padding: 10px;
             margin: 5px 0;
             width: 100%;
@@ -26,14 +26,41 @@
             width: 100%;
             overflow: auto;
         }
+        .selected-symptoms {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .selected-symptoms span {
+            display: inline-block;
+            background-color: #ccc;
+            padding: 5px;
+            margin: 5px;
+            border-radius: 5px;
+            position: relative;
+        }
+        .selected-symptoms span:hover::after {
+            content: '✖';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Disease Diagnosis</h1>
         <form id="diagnosis-form">
-            <label for="symptoms">Enter Symptoms (comma-separated):</label>
-            <input type="text" id="symptoms" name="symptoms" placeholder="e.g., fever, cough">
+            <label for="symptoms">Select Symptoms:</label>
+            <select id="symptom-select">
+                <option value="" disabled selected> </option>
+            </select>
+            <div class="selected-symptoms" id="selected-symptoms"></div>
             <button type="submit">Diagnose</button>
         </form>
         <div class="result-section">
@@ -42,18 +69,55 @@
         </div>
     </div>
     <script>
+        const selectedSymptoms = new Set();
+
+        async function fetchSymptoms() {
+            const response = await fetch('http://localhost:8090/symptoms');
+            const symptoms = await response.json();
+            const select = document.getElementById('symptom-select');
+            symptoms.forEach(symptom => {
+                const option = document.createElement('option');
+                option.value = symptom;
+                option.textContent = symptom;
+                select.appendChild(option);
+            });
+        }
+
+        document.getElementById('symptom-select').addEventListener('change', function() {
+            const select = document.getElementById('symptom-select');
+            const symptom = select.value;
+            if (!selectedSymptoms.has(symptom)) {
+                selectedSymptoms.add(symptom);
+                const span = document.createElement('span');
+                span.textContent = symptom;
+                span.addEventListener('click', function() {
+                    selectedSymptoms.delete(symptom);
+                    span.remove();
+                    select.querySelector(`option[value="${symptom}"]`).disabled = false;
+                });
+                document.getElementById('selected-symptoms').appendChild(span);
+                select.querySelector(`option[value="${symptom}"]`).disabled = true;
+            }
+            select.value = '';  // Reset the dropdown
+        });
+
         document.getElementById('diagnosis-form').addEventListener('submit', async function(event) {
             event.preventDefault();
-            const symptoms = document.getElementById('symptoms').value;
+            const symptoms = Array.from(selectedSymptoms).join(',');
             const response = await fetch(`http://localhost:8090/diagnose?symptoms=${symptoms}`);
             const data = await response.json();
             const resultDiv = document.getElementById('result');
             if (data.error) {
                 resultDiv.textContent = data.error;
+            } else if (data.length === 0) {
+                resultDiv.textContent = 'No matching disease found.';
             } else {
                 resultDiv.innerHTML = `<ul>${data.map(disease => `<li>${disease}</li>`).join('')}</ul>`;
             }
         });
+
+        // Fetch symptoms when the page loads
+        fetchSymptoms();
     </script>
 </body>
 </html>
