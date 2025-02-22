@@ -16,7 +16,7 @@ has_symptoms(covid19, [fever, cough, shortness_of_breath, sore_throat]).
 has_symptoms(common_cold, [sneezing, runny_nose, sore_throat, cough]).
 has_symptoms(measles, [fever, cough, runny_nose, rash, red_eyes]).
 has_symptoms(malaria, [fever, chills, sweating, headache, nausea, vomiting]).
-has_symptoms(uti, [bloody_urine, pelvic_pain, lower_back_pain, increased_urination, painful_urination])
+has_symptoms(uti, [bloody_urine, pelvic_pain, lower_back_pain, increased_urination, painful_urination]).
 
 
 % Rule to find diseases based on symptoms
