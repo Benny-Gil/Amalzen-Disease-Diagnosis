@@ -9,18 +9,31 @@
 % Set CORS setting to allow all origins
 :- set_setting(http:cors, [*]).
 
-
 % Define HTTP handlers
 :- http_handler(root(diagnose), diagnose_handler, []).
 :- http_handler(root(symptoms), symptoms_handler, []).
 
 % Start the HTTP server on port 8090
 start_server :-
-    http_server(http_dispatch, [port(8090)]),
-    format('Server started at http://localhost:8090/~n').
+    format('Starting server on port 8090...~n'),
+    catch(
+        http_server(http_dispatch, [port(8090), bind('0.0.0.0')]),  % Bind to all network interfaces
+        Error,
+        (   format('Failed to start server: ~w~n', [Error]),
+            fail
+        )
+    ),
+    format('Server started at http://localhost:8090/~n'),
+    wait_forever.
+
+% Keep the server running
+wait_forever :-
+    repeat,
+    sleep(1),
+    fail.
 
 stop_server :-
-    http_stop_server(8090,[]).
+    http_stop_server(8090, []),
     format('Server stopped~n').
 
 % Handle /diagnose?symptoms=symptom1,symptom2
