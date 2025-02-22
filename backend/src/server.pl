@@ -19,6 +19,10 @@ start_server :-
     http_server(http_dispatch, [port(8090)]),
     format('Server started at http://localhost:8090/~n').
 
+stop_server :-
+    http_stop_server(8090,[]).
+    format('Server stopped~n').
+
 % Handle /diagnose?symptoms=symptom1,symptom2
 diagnose_handler(Request) :-
     cors_enable(Request, [methods([get])]),  % Enable CORS for GET requests
@@ -39,5 +43,6 @@ symptoms_handler(_) :-
     reply_json(SortedSymptoms).
 
 % Enable CORS for all responses
-:- multifile http:access_control_allow_origin/2.
+% :- multifile http:access_control_allow_origin/2.
+:- start_server.
 http:access_control_allow_origin(_, '*').
