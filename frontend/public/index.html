@@ -72,7 +72,7 @@
         const selectedSymptoms = new Set();
 
         async function fetchSymptoms() {
-            const response = await fetch('http://localhost:8090/symptoms');
+            const response = await fetch('http://localhost/api/symptoms');
             const symptoms = await response.json();
             const select = document.getElementById('symptom-select');
             symptoms.forEach(symptom => {
