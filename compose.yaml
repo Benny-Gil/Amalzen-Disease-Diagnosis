@@ -20,7 +20,7 @@ services:
     volumes:
       - ./frontend:/app
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
   
   nginx:
     image: nginx:latest
