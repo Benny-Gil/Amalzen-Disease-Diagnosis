@@ -7,6 +7,8 @@ services:
       - "8090:8090"
     networks:
       - prolog-network
+    volumes:
+      - ./backend/src:/app/src
 
   frontend:
     build:
@@ -15,6 +17,10 @@ services:
       - "8080:8080"
     networks:
       - prolog-network
+    volumes:
+      - ./frontend:/app
+    environment:
+      - NODE_ENV=development
   
   nginx:
     image: nginx:latest
