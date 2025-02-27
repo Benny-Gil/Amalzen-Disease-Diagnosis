@@ -1,23 +1,62 @@
 # Amalzen-Disease-Diagnosis
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/)
+[![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/)
+
+[![Prolog](https://img.shields.io/badge/Prolog-SWI-orange.svg)](https://www.swi-prolog.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/yourusername/Amalzen-Disease-Diagnosis)
+
 Amalzen Disease Diagnosis is a program for identifying a user's disease based on symptoms using the Prolog Programming Language.
 
 ## Setting Up your environment
 
-1. **Install SWI-Prolog**: Ensure you have SWI-Prolog installed on your machine. You can download it from [SWI-Prolog's official website](https://www.swi-prolog.org/Download.html).
+1. **Install Docker and Docker Compose**: Ensure you have Docker and Docker Compose installed on your machine. You can download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop).
 
 2. **Clone the Repository**:
     ```sh
     git clone https://github.com/yourusername/Amalzen-Disease-Diagnosis.git
     cd Amalzen-Disease-Diagnosis
     ```
+3. **Install SWI-Prolog(Optional):** Install SWI-Prolog if you want to use Prolog in your machine. You can download it from [SWI-Prolog's official website](https://www.swi-prolog.org/Download.html).
 
-## Running the Program
+## Running with Docker
 
-You can run the program using either the CLI or the web interface.
+### Building and Running Containers
+
+1. **Build all containers** using Docker Compose:
+    ```sh
+    docker-compose up --build
+    ```
+   This will build and start all services (prolog-api, frontend, and nginx).
+
+2. **Run all containers**
+    ```sh
+    docker-compose up
+    ```
+    This will run all services
+
+3. **Stop all containers**
+    ```sh
+    docker-compose down
+    ```
+    This will stopp all services
+
+3. **Access the application**:
+   - 
+   - Web interface: http://localhost:80 (served by nginx)
+   - Direct API access: http://localhost:8090/diagnose?symptoms=fever,cough
+
+   ![Disease Diagnosis Interface](docs/image.png)
 
 ### Running via CLI
 
-1. Navigate to the `backend/src` directory:
+1. Navigate to the src directory:
     ```sh
     cd backend/src
     ```
@@ -31,67 +70,18 @@ You can run the program using either the CLI or the web interface.
     ```prolog
     ?- [main].
     ```
+
 4. Follow the on-screen instructions to use the interactive mode or start the web server.
-    ```prolog
-    Disease Diagnosis System
-    1. Interactive Mode
-    2. Start Web Server
-    3. Exit
-    ```
 
-5. If you choose interactive mode Type "1." and your symptom/s:
-    ```prolog
-    > swipl main.pl
-
-    Disease Diagnosis System
-    1. Interactive Mode
-    2. Start Web Server
-    3. Exit
-    |: 1.
-
-    Enter symptoms separated by commas (e.g., fever,cough,sore_throat):
-    |: fever
-    Possible diseases: [dengue_fever,mpox,covid19,measles,malaria]
-    ```
-
-6. Terminate the prolog interpreter:
-    - Type "3." or use the halt query
-    ```
-    ?- halt.
-    ```
-
-
-### Running via Web Interface
-
-1. Navigate to the `backend/src` directory:
-    ```sh
-    cd backend/src
-    ```
-
-2. Run the server using this command:
-    ```sh
-    swipl -s server.pl -g start_server 
-    ```
-4. The API will be available at `http://localhost:8090`, you can test it using this terminal command.
-    ```sh
-    curl "http://localhost:8090/diagnose?symptoms=fever,cough"
-    ```
-    It should return this diagnosis:
-    ```sh
-    ["covid19", "measles" ]
-    ```
-
-5. To Access the the web interface, open the index html file in your browser:
-    ```sh
-    open frontend/index.html # For Unix devices
-    ```
-6. Enter symptoms in the input field and click "Diagnose" to get the diagnosis results.
-![alt text](docs/image.png)
 
 ## Project Structure
 
-- `backend/src/knowledge.pl`: Contains the knowledge base with diseases and their symptoms.
-- `backend/src/logic.pl`: Contains the logic for diagnosing diseases based on symptoms.
-- `backend/src/main.pl`: Contains the main entry point for the CLI and web server.
-- `backend/src/server.pl`: Contains the code for the web server.
-- `frontend/index.html`: Contains the HTML file for the web interface.
+- backend: Contains the Prolog backend code
+  - `src/knowledge.pl`: Knowledge base with diseases and their symptoms
+  - `src/logic.pl`: Diagnosis logic
+  - `src/server.pl`: Web server code
+  - `src/main.pl`: CLI entry point
+- frontend: Contains the web interface
+- `docker-compose.yaml`: Docker Compose configuration
+- nginx.conf: Nginx configuration
+
