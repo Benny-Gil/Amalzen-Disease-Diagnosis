@@ -20,7 +20,7 @@ services:
     volumes:
       - ./frontend:/app
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV:-production}  # Default to production, can be overridden
   
   nginx:
     image: nginx:latest
