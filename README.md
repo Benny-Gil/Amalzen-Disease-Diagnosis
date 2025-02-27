@@ -41,7 +41,16 @@ Amalzen Disease Diagnosis is a program for identifying a user's disease based on
     ```
     This will run all services
 
-3. **Stop all containers**
+   To Run the frontend using nodemon use the command (for Windows):
+   ```sh
+   $env:NODE_ENV="development"; docker-compose up --build
+   ```
+   Or macOS/Linux
+   ```sh
+   NODE_ENV=development docker compose up --build
+   ```
+
+4. **Stop all containers**
     ```sh
     docker-compose down
     ```
