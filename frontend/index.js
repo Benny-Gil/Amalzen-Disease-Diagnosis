@@ -12,6 +12,10 @@ app.use('/js', express.static(path.join(publicDir, 'js')))
 
 app.use(express.json())
 
+app.get('/health', (req, res) => {
+    res.send('OK')
+}
+)
 
 app.get('/', controller(publicDir))
 
