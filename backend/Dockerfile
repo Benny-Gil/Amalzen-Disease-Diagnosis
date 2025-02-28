@@ -4,8 +4,8 @@ FROM swipl:latest
 # Create a work directory
 WORKDIR /app
 
-# Copy your Prolog files into the container
-COPY src/*.pl ./
+# Copy your Prolog files into the container; changed from "COPY src/*.pl ./"
+COPY src/ ./
 
 # Create a non-privileged user
 ARG UID=10001
@@ -24,11 +24,8 @@ RUN chown -R appuser:appuser /app
 # Switch to non-privileged user
 USER appuser
 
-RUN ls
+# List the contents of the /app directory for debugging; changed from "RUN ls"
+RUN ls -la /app
 
 # Command to run your main Prolog file
-# Replace 'main.pl' with your main Prolog file name
 ENTRYPOINT ["swipl", "-s", "./server.pl"]
-
-# If you want to run it in interactive mode, use this instead:
-# ENTRYPOINT ["swipl"]

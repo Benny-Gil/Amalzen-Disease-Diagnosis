@@ -5,13 +5,17 @@
 :- use_module(library(http/http_json)).
 :- use_module(logic).  % Import diagnosis logic
 
+:- use_module(json_injector). % Imported the json_injector module
+:- use_module(disease_kb).  % Imported the disease_kb module
 
 % Define HTTP handlers
 :- http_handler(root(diagnose), diagnose_handler, []).
 :- http_handler(root(symptoms), symptoms_handler, []).
+:- http_handler(root(diseases), diseases_handler, []). % Added http handler to show list of diseases with symptoms
 
 % Start the HTTP server on port 8090
 start_server :-
+    load_add_diseases_from_json, % Method for injecting diseases and symptoms from JSON file
     format('Starting server on port 8090...~n'),
     catch(
         http_server(http_dispatch, [port(8090), bind('0.0.0.0')]),  % Bind to all network interfaces
@@ -49,5 +53,14 @@ diagnose_handler(Request) :-
 symptoms_handler(_) :-
     all_symptoms(SortedSymptoms),
     reply_json(SortedSymptoms).
+
+% Handle /diseases to get the list of all diseases and their corresponding symptoms
+diseases_handler(_) :-
+    findall(json{disease: Disease, symptoms: Symptoms},
+            (   disease_kb:disease(Disease),
+                findall(Symptom, disease_kb:has_symptoms(Disease, Symptom), Symptoms)
+            ),
+            Diseases),
+    reply_json(Diseases).
 
 :- start_server.
