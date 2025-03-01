@@ -2,9 +2,11 @@
 :- use_module(knowledge).
 :- use_module(logic).
 :- use_module(server).
+:- use_module(json_injector). % Imported the json_injector module
 
 % Main function
 main :-
+    load_add_diseases_from_json, % Method for injecting diseases and symptoms from JSON file
     writeln('\nDisease Diagnosis System'),
     writeln('1. Interactive Mode'),
     writeln('2. Start Web Server'),

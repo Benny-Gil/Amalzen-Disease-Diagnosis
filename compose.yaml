@@ -1,4 +1,3 @@
-
 services:
   prolog-api:
     build:
@@ -8,7 +7,7 @@ services:
     networks:
       - prolog-network
     volumes:
-      - ./backend/src:/app/src
+      - ./backend/src:/app # Changed from "./backend/src:/app/src"
 
   frontend:
     build:

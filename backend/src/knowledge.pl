@@ -1,5 +1,9 @@
 % Define the module
-:- module(knowledge, [has_symptoms/2, disease/1]).
+:- module(disease_kb, [has_symptoms/2, disease/1, add_disease/2]). % Added add_disease function
+
+% Dynamic predicates to allow modification at runtime
+:- dynamic has_symptoms/2.
+:- dynamic disease/1.
 
 % Disease facts
 disease(bone_cancer).
@@ -52,3 +56,15 @@ has_symptoms(uti, [painful_urination, increased_urination, lower_back_pain, bloo
 % Rule to find diseases based on symptoms
 possible_disease(Symptom, Disease) :-
     has_symptoms(Disease, Symptom).
+
+% Asserting new diseases and its symptoms with debug statements
+add_disease(Disease, Symptoms) :-
+    format('Adding disease: ~w with symptoms: ~w~n', [Disease, Symptoms]),
+    (   assertz(disease(Disease))
+    ->  format('Successfully asserted disease: ~w~n', [Disease])
+    ;   format('Failed to assert disease: ~w~n', [Disease])
+    ),
+    (   assertz(has_symptoms(Disease, Symptoms))
+    ->  format('Successfully asserted symptoms for disease: ~w~n', [Disease])
+    ;   format('Failed to assert symptoms for disease: ~w~n', [Disease])
+    ).
