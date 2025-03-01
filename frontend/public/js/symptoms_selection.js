@@ -26,9 +26,10 @@ const symptomimgs = {
     heart_palpitations: "imgs/heart_palpitations.webp",
     hydrophobia: "imgs/hydrophobia.jpg",
     increased_urination: "imgs/increased_urination.jpg",
+    intolerance_of_fatty_foods: "imgs/intolerance_of_fatty_foods.webp",
     itching: "imgs/itching.avif",
     jaundice: "imgs/jaundice.jpeg",
-    joint_pain: "imgs/joint_pain.jpg",
+    joint_pain: "imgs/joint_pain.png",
     lockjaw: "imgs/lockjaw.jpg",
     losing_consciousness: "imgs/losing_consciousness.avif",
     lower_back_pain: "imgs/lower_back_pain.jpg",
@@ -40,10 +41,10 @@ const symptomimgs = {
     muscle_stiffness: "imgs/muscle_stiffness.jpg",
     nausea: "imgs/nausea.avif",
     night_sweats: "imgs/night_sweats.webp",
-    no_appetite: "imgs/no_appetite.jpg",
+    no_appetite: "imgs/appetite_loss.jpg",
     numbness: "imgs/numbness.jpg",
     open_sores: "imgs/open_sores.jpg",
-    pain_and_swelling: "imgs/pain_and_swelling.jpg",
+    pain_and_swelling: "imgs/painful_swelling.avif",
     pain_between_shoulder_blades: "imgs/pain_between_shoulder_blades.jpg",
     pain_in_right_shoulder: "imgs/pain_in_right_shoulder.png",
     painful_swelling: "imgs/painful_swelling.avif",
@@ -85,12 +86,25 @@ async function fetchSymptoms() {
         symptoms.forEach(symptom => {
             const div = document.createElement("div");
             div.classList.add("symptom");
-            div.textContent = symptom;
-
+            
+            // Convert snake_case to Sentence case
+            const formattedSymptom = symptom
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, char => char.toUpperCase());
+            
+            // Create text node for the formatted symptom name
+            const textNode = document.createElement("div");
+            textNode.textContent = formattedSymptom;
+            textNode.classList.add("symptom-name");
+            
+            // Add image
             const img = document.createElement("img");
-            img.src = symptomimgs[symptom] || "frontend/imgs/default.jpg";
-            img.alt = symptom;
+            img.src = symptomimgs[symptom] ? symptomimgs[symptom] : "imgs/default.jpg";
+            img.alt = formattedSymptom;
             img.classList.add("symptom-img");
+            
+            // Append elements in correct order
+            div.appendChild(textNode);
             div.appendChild(img);
 
             div.addEventListener("click", function () {
@@ -114,7 +128,11 @@ function updateSelectedSymptoms() {
     selectedSymptoms.forEach(symptom => {
         const div = document.createElement("div");
         div.classList.add("selected-symptom");
-        div.textContent = symptom;
+
+        const formattedSymptom = symptom
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, char => char.toUpperCase());
+        div.textContent = formattedSymptom;
 
         const img = document.createElement("img");
         img.src = symptomimgs[symptom] || "frontend/imgs/default.jpg";

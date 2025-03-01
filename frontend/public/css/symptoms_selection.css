@@ -6,82 +6,102 @@ body {
 }
 
 .container {
-    width: 80%;
+    width: 90%;
+    max-width: 1800px;
     margin: auto;
 }
 
 .symptoms-container {
-    display: flex;
-    flex-wrap: wrap;
     overflow-y: auto;
-    justify-content: center;
-    max-height: 560px;
-    max-width: 1750px;
-    border: 2px solid white;
-    padding: 10px;
+    max-height: 600px;
+    padding: 15px;
     background-color: #5d8a79;
+    border: 2px solid white;
+    margin: auto;
 }
 
-.symptoms-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px; 
-    max-width: 1700px; 
-    margin: auto;
+#symptoms-list {
+    column-count: 3;
+    column-gap: 15px;
+    width: 100%;
 }
 
 .symptom {
+    break-inside: avoid;
     background-color: #d9f2e6;
     color: #2c5d50;
-    margin: 5px;
-    padding: 10px;
-    height: 220px;
-    width: 555px; 
-    border-radius: 8px;
-    font-weight: bold;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-sizing: border-box;
-    flex-wrap: wrap;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    transition: transform 0.2s;
 }
 
-@media (max-width: 1700px) {
-    .symptom {
-        width: calc(33.33% - 20px);
+.symptom:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.symptom-img {
+    width: 100%;
+    display: block;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    object-fit: cover;
+}
+
+.symptom-name {
+    padding: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+@media (max-width: 1200px) {
+    #symptoms-list {
+        column-count: 2;
     }
 }
 
-.symptom-img{
-    height: 180px;
-    width: 530px;
-    border-radius: 10px;
+@media (max-width: 768px) {
+    #symptoms-list {
+        column-count: 1;
+    }
 }
 
 .selected-symptom {
     display: inline-block;
-    background-color: #ccc;
+    background-color: #305047;
     padding: 10px;
-    margin: 5px;
-    border-radius: 5px;
+    margin: 8px;
+    border-radius: 8px;
     position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .selected-symptom img {
     width: 50px;
     height: 50px;
     border-radius: 5px;
+    margin-right: 8px;
+    vertical-align: middle;
 }
 
 button {
     background-color: #d9f2e6;
+    color: #2c5d50;
     border: none;
-    padding: 10px 15px;
-    margin-top: 10px;
+    padding: 12px 20px;
+    margin: 15px 5px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
 }
 
+button:hover {
+    background-color: #b8e5cf;
+    transform: translateY(-2px);
+}
