@@ -30,7 +30,7 @@ disease(tuberculosis).
 disease(uti).
 
 % Symptoms for each disease using lists
-has_symptoms(bone_cancer, [persistent_bone_pain, swelling_or_lump, weakened_bones, unexplained_weight_loss, fever_or_night_sweats]).
+has_symptoms(bone_cancer, [persistent_bone_pain, swelling_or_lump, weakened_bones, unexplained_weight_loss, fever, night_sweats]).
 has_symptoms(cardiac_arrest, [fatigue, dizziness, shortness_of_breath, nausea, chest_pain, heart_palpitations, losing_consciousness]).
 has_symptoms(chickenpox, [fever, tiredness, headache, no_appetite, rash]).
 has_symptoms(common_cold, [sneezing, runny_nose, sore_throat, cough]).

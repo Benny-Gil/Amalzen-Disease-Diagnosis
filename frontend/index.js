@@ -6,6 +6,7 @@ const app = express()
 
 const publicDir = path.join(__dirname,'public')
 
+
 app.use('/css',express.static(path.join(publicDir, 'css')))
 app.use('/imgs', express.static(path.join(publicDir, 'imgs')))
 app.use('/js', express.static(path.join(publicDir, 'js')))
@@ -18,6 +19,11 @@ app.get('/health', (req, res) => {
 )
 
 app.get('/', controller(publicDir))
+
+app.get('/symptom_selection', (req,res)=>{
+    res.sendFile(path.join(publicDir,'views','symptoms_selection.html'))
+})
+
 
 app.listen(8080, () => {
     console.log("Running on port 8080")
