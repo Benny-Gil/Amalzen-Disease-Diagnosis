@@ -1,27 +1,18 @@
 document.addEventListener("DOMContentLoaded", function () {
     const symptomDetailsContainer = document.getElementById("symptoms-list");
-    const diseaseContainer = document.getElementById("disease-container"); // New container for disease name
+    const diseaseContainer = document.getElementById("disease-container"); 
     const backButton = document.getElementById("back-btn");
 
-    // Retrieve selected symptoms and diagnosis results from local storage
     const selectedSymptoms = new Set(JSON.parse(localStorage.getItem("selectedSymptoms")) || []);
     let diagnosisResults = JSON.parse(localStorage.getItem("diagnosisResults")) || [];
-    const allSymptoms = Object.keys(symptomimgs);
-    
-    // TODO: localStorage is not working here, it's not showing the selected disease but it's fetching it.
     let chosenDisease = localStorage.getItem("chosenDisease");
-    if (!chosenDisease || chosenDisease === "null") {
-        chosenDisease = "Unknown Disease";
-    } else {
-        chosenDisease = JSON.parse(chosenDisease);
+
+    // Format disease name for better readability
+    function formatDiseaseName(disease) {
+        return disease.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
     }
 
-    console.log("Selected Symptoms:", Array.from(selectedSymptoms));
-    console.log("Diagnosis Results:", diagnosisResults);
-    console.log("Chosen Disease:", chosenDisease);
-    console.log("All Symptoms:", allSymptoms);
-
-    // Fetch associated symptoms if diagnosisResults only contains a disease name
+    // Define disease symptoms mapping
     const diseaseSymptomsMap = {
         "gallstones": ["nausea", "vomiting", "jaundice"],
         "hepatitisb": ["jaundice", "dark_urine", "fatigue"],
@@ -36,24 +27,29 @@ document.addEventListener("DOMContentLoaded", function () {
         "anemia": ["fatigue", "pale_skin", "shortness_of_breath", "dizziness"]
     };
 
-    if (diagnosisResults.length === 1 && typeof diagnosisResults[0] === "string") {
-        const diseaseName = diagnosisResults[0];
-        if (diseaseSymptomsMap[diseaseName]) {
-            diagnosisResults = diseaseSymptomsMap[diseaseName];
-            chosenDisease = diseaseName;
-            localStorage.setItem("chosenDisease", JSON.stringify(chosenDisease)); // Ensure it's stored properly
-            console.log("Loaded symptoms for disease:", diagnosisResults);
+    // Handle chosen disease
+    if (!chosenDisease || chosenDisease === "null") {
+        chosenDisease = "Unknown Disease";
+    } else {
+        try {
+            chosenDisease = JSON.parse(chosenDisease);
+        } catch (e) {
+            chosenDisease = "Unknown Disease";
         }
-    }    
+    }
 
-    // Convert diagnosisResults into a Set for easier lookup
+    if (diagnosisResults.length === 1 && typeof diagnosisResults[0] === "string") {
+        chosenDisease = diagnosisResults[0];
+        localStorage.setItem("chosenDisease", JSON.stringify(chosenDisease));
+        diagnosisResults = diseaseSymptomsMap[chosenDisease] || [];
+    }
+
+    diseaseContainer.innerHTML = `<h2>Diagnosis: ${formatDiseaseName(chosenDisease)}</h2>`;
+
+    // Sort symptoms: Selected symptoms first, then diagnosis suggestions
+    const allSymptoms = Object.keys(symptomimgs);
     const diagnosisSymptoms = new Set(diagnosisResults);
-
-    // TODO: localStorage is not working here, it's not showing the selected disease but it's fetching it.
-    // Show the chosen disease at the top
-    diseaseContainer.innerHTML = `<h2>Diagnosis: ${chosenDisease}</h2>`;
-
-    // Sort symptoms: Selected symptoms first, then diagnosis symptoms
+    
     allSymptoms.sort((a, b) => {
         if (selectedSymptoms.has(b)) return 1;
         if (selectedSymptoms.has(a)) return -1;
@@ -62,30 +58,24 @@ document.addEventListener("DOMContentLoaded", function () {
         return 0;
     });
 
+    // Display symptoms
     allSymptoms.forEach(symptom => {
         const symptomDiv = document.createElement("div");
         symptomDiv.classList.add("symptom-detail");
 
-        // Convert snake_case to Sentence case
-        const formattedSymptom = symptom.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-
-        // Create symptom name element
+        const formattedSymptom = formatDiseaseName(symptom);
         const symptomName = document.createElement("h3");
         symptomName.textContent = formattedSymptom;
 
-        // Create symptom image container
         const imgContainer = document.createElement("div");
         imgContainer.classList.add("symptom-img-container");
 
-        // Create symptom image element
         const img = document.createElement("img");
         img.src = symptomimgs[symptom] || "imgs/default.jpg";
         img.alt = formattedSymptom;
         img.classList.add("symptom-img");
-
         imgContainer.appendChild(img);
 
-        // Add checkmark if symptom is selected
         if (selectedSymptoms.has(symptom)) {
             const checkmark = document.createElement("img");
             checkmark.src = "imgs/checkmark.png";
@@ -94,7 +84,6 @@ document.addEventListener("DOMContentLoaded", function () {
             imgContainer.appendChild(checkmark);
         }
 
-        // Add diagnosis label if symptom is part of the diagnosis results
         if (diagnosisSymptoms.has(symptom) && !selectedSymptoms.has(symptom)) {
             const diagnosisLabel = document.createElement("span");
             diagnosisLabel.textContent = "Suggested by Diagnosis";
@@ -107,12 +96,11 @@ document.addEventListener("DOMContentLoaded", function () {
         symptomDetailsContainer.appendChild(symptomDiv);
     });
 
-    // Back button to go back to the previous page
+    // Back button event listener
     backButton.addEventListener("click", function () {
         window.location.href = "/possible_diseases";
     });
 });
-
 
 // Symptom images mapping
 const symptomimgs = {
