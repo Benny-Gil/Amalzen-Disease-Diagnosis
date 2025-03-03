@@ -162,12 +162,18 @@ document.getElementById("submit-btn").addEventListener("click", async function (
         const response = await fetch(`http://localhost/api/diagnose?symptoms=${selectedSymptoms.join(",")}`);
         const diseases = await response.json();
 
+        localStorage.setItem("selectedSymptoms", JSON.stringify(selectedSymptoms));
         localStorage.setItem("diagnosisResults", JSON.stringify(diseases));
-        window.location.href = "results.html";
+
+        console.log("Selected Symptoms:", JSON.stringify(selectedSymptoms));
+        console.log("Diagnosis Results:", JSON.stringify(diseases));
+
+        window.location.href = "/possible_diseases";
     } catch (error) {
         console.error("Error fetching diagnosis results:", error);
         alert("Failed to fetch diagnosis results. Please try again later.");
     }
 });
+
 
 fetchSymptoms();
