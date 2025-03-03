@@ -1,49 +1,68 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     const symptomDetailsContainer = document.getElementById("symptoms-list");
     const diseaseContainer = document.getElementById("disease-container"); 
     const backButton = document.getElementById("back-btn");
 
     const selectedSymptoms = new Set(JSON.parse(localStorage.getItem("selectedSymptoms")) || []);
     let diagnosisResults = JSON.parse(localStorage.getItem("diagnosisResults")) || [];
-    let chosenDisease = localStorage.getItem("chosenDisease");
+    const urlParams = new URLSearchParams(window.location.search);
+    let chosenDisease = urlParams.get('disease');
 
     // Format disease name for better readability
     function formatDiseaseName(disease) {
         return disease.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
     }
 
-    // Define disease symptoms mapping
-    const diseaseSymptomsMap = {
-        "gallstones": ["nausea", "vomiting", "jaundice"],
-        "hepatitisb": ["jaundice", "dark_urine", "fatigue"],
-        "pneumonia": ["cough", "fever", "chills", "shortness_of_breath"],
-        "bronchitis": ["cough", "mucus_production", "chest_discomfort", "fatigue"],
-        "diabetes": ["increased_thirst", "frequent_urination", "extreme_hunger", "fatigue"],
-        "hypertension": ["headache", "dizziness", "blurred_vision", "nosebleeds"],
-        "asthma": ["shortness_of_breath", "wheezing", "chest_tightness", "coughing"],
-        "migraine": ["severe_headache", "nausea", "sensitivity_to_light", "blurred_vision"],
-        "appendicitis": ["abdominal_pain", "nausea", "vomiting", "fever"],
-        "stroke": ["numbness", "confusion", "trouble_speaking", "loss_of_balance"],
-        "anemia": ["fatigue", "pale_skin", "shortness_of_breath", "dizziness"]
-    };
-
-    // Handle chosen disease
-    if (!chosenDisease || chosenDisease === "null") {
-        chosenDisease = "Unknown Disease";
-    } else {
-        try {
-            chosenDisease = JSON.parse(chosenDisease);
-        } catch (e) {
-            chosenDisease = "Unknown Disease";
-        }
+    // Fetch disease symptoms map from API
+    let diseaseSymptomsMap = {};
+    try {
+        const response = await fetch('http://localhost/api/diseases');
+        const diseasesData = await response.json();
+        
+        // Transform API data into the required format
+        diseasesData.forEach(item => {
+            // Handle nested symptoms array (flatten if needed)
+            let symptoms = [];
+            if (Array.isArray(item.symptoms) && item.symptoms.length > 0) {
+                // If symptoms is an array of arrays, flatten it
+                if (Array.isArray(item.symptoms[0])) {
+                    symptoms = item.symptoms.flat();
+                } else {
+                    symptoms = item.symptoms;
+                }
+            }
+            diseaseSymptomsMap[item.disease] = symptoms;
+        });
+        console.log("Disease symptoms loaded successfully");
+        // console.log("Disease symptoms map:", diseaseSymptomsMap);
+    } catch (error) {
+        console.error("Error fetching disease data:", error);
+        // Fallback to empty map if API fails
+        diseaseSymptomsMap = {};
     }
+
+    // // Handle chosen disease
+    // if (!chosenDisease || chosenDisease === "null") {
+    //     chosenDisease = "Unknown Disease";
+    // } else {
+    //     try {
+    //         chosenDisease = JSON.parse(chosenDisease);
+    //     } catch (e) {
+    //         chosenDisease = "Unknown Disease";
+    //     }
+    // }
 
     if (diagnosisResults.length === 1 && typeof diagnosisResults[0] === "string") {
         chosenDisease = diagnosisResults[0];
         localStorage.setItem("chosenDisease", JSON.stringify(chosenDisease));
-        diagnosisResults = diseaseSymptomsMap[chosenDisease] || [];
     }
 
+    // Always get the full symptom list from the API data for the chosen disease
+    if (chosenDisease !== "Unknown Disease" && diseaseSymptomsMap[chosenDisease]) {
+        diagnosisResults = diseaseSymptomsMap[chosenDisease];
+        console.log("Symptoms for selected disease:", diagnosisResults);
+    }
+    formatDiseaseName(chosenDisease);
     diseaseContainer.innerHTML = `<h2>Diagnosis: ${formatDiseaseName(chosenDisease)}</h2>`;
 
     // Sort symptoms: Selected symptoms first, then diagnosis suggestions
@@ -60,40 +79,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Display symptoms
     allSymptoms.forEach(symptom => {
-        const symptomDiv = document.createElement("div");
-        symptomDiv.classList.add("symptom-detail");
+        if (selectedSymptoms.has(symptom) || diagnosisSymptoms.has(symptom)) {
+            const symptomDiv = document.createElement("div");
+            symptomDiv.classList.add("symptom-detail");
 
-        const formattedSymptom = formatDiseaseName(symptom);
-        const symptomName = document.createElement("h3");
-        symptomName.textContent = formattedSymptom;
+            const formattedSymptom = formatDiseaseName(symptom);
+            const symptomName = document.createElement("h3");
+            symptomName.textContent = formattedSymptom;
 
-        const imgContainer = document.createElement("div");
-        imgContainer.classList.add("symptom-img-container");
+            const imgContainer = document.createElement("div");
+            imgContainer.classList.add("symptom-img-container");
 
-        const img = document.createElement("img");
-        img.src = symptomimgs[symptom] || "imgs/default.jpg";
-        img.alt = formattedSymptom;
-        img.classList.add("symptom-img");
-        imgContainer.appendChild(img);
+            const img = document.createElement("img");
+            img.src = symptomimgs[symptom] || "imgs/default.jpg";
+            img.alt = formattedSymptom;
+            img.classList.add("symptom-img");
+            imgContainer.appendChild(img);
 
-        if (selectedSymptoms.has(symptom)) {
-            const checkmark = document.createElement("img");
-            checkmark.src = "imgs/checkmark.png";
-            checkmark.alt = "Selected";
-            checkmark.classList.add("checkmark-icon");
-            imgContainer.appendChild(checkmark);
+            if (selectedSymptoms.has(symptom)) {
+                const checkmark = document.createElement("img");
+                checkmark.src = "imgs/checkmark.png";
+                checkmark.alt = "Selected";
+                checkmark.classList.add("checkmark-icon");
+                imgContainer.appendChild(checkmark);
+            }
+
+            if (diagnosisSymptoms.has(symptom) && !selectedSymptoms.has(symptom)) {
+                const diagnosisLabel = document.createElement("span");
+                diagnosisLabel.textContent = "Suggested by Diagnosis";
+                diagnosisLabel.classList.add("diagnosis-label");
+                symptomDiv.appendChild(diagnosisLabel);
+            }
+
+            symptomDiv.appendChild(symptomName);
+            symptomDiv.appendChild(imgContainer);
+            symptomDetailsContainer.appendChild(symptomDiv);
         }
-
-        if (diagnosisSymptoms.has(symptom) && !selectedSymptoms.has(symptom)) {
-            const diagnosisLabel = document.createElement("span");
-            diagnosisLabel.textContent = "Suggested by Diagnosis";
-            diagnosisLabel.classList.add("diagnosis-label");
-            symptomDiv.appendChild(diagnosisLabel);
-        }
-
-        symptomDiv.appendChild(symptomName);
-        symptomDiv.appendChild(imgContainer);
-        symptomDetailsContainer.appendChild(symptomDiv);
     });
 
     // Back button event listener
