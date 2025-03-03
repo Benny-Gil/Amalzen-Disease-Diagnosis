@@ -6,9 +6,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // Retrieve selected symptoms and diagnosis results from local storage
     const selectedSymptoms = new Set(JSON.parse(localStorage.getItem("selectedSymptoms")) || []);
     let diagnosisResults = JSON.parse(localStorage.getItem("diagnosisResults")) || [];
-    const storedDisease = localStorage.getItem("chosenDisease");
-    const chosenDisease = storedDisease && storedDisease !== "null" ? JSON.parse(storedDisease) : "Unknown Disease";  
     const allSymptoms = Object.keys(symptomimgs);
+    
+    // TODO: localStorage is not working here, it's not showing the selected disease but it's fetching it.
+    let chosenDisease = localStorage.getItem("chosenDisease");
+    if (!chosenDisease || chosenDisease === "null") {
+        chosenDisease = "Unknown Disease";
+    } else {
+        chosenDisease = JSON.parse(chosenDisease);
+    }
 
     console.log("Selected Symptoms:", Array.from(selectedSymptoms));
     console.log("Diagnosis Results:", diagnosisResults);
@@ -19,24 +25,33 @@ document.addEventListener("DOMContentLoaded", function () {
     const diseaseSymptomsMap = {
         "gallstones": ["nausea", "vomiting", "jaundice"],
         "hepatitisb": ["jaundice", "dark_urine", "fatigue"],
-        // Add more diseases with their predicted symptoms
+        "pneumonia": ["cough", "fever", "chills", "shortness_of_breath"],
+        "bronchitis": ["cough", "mucus_production", "chest_discomfort", "fatigue"],
+        "diabetes": ["increased_thirst", "frequent_urination", "extreme_hunger", "fatigue"],
+        "hypertension": ["headache", "dizziness", "blurred_vision", "nosebleeds"],
+        "asthma": ["shortness_of_breath", "wheezing", "chest_tightness", "coughing"],
+        "migraine": ["severe_headache", "nausea", "sensitivity_to_light", "blurred_vision"],
+        "appendicitis": ["abdominal_pain", "nausea", "vomiting", "fever"],
+        "stroke": ["numbness", "confusion", "trouble_speaking", "loss_of_balance"],
+        "anemia": ["fatigue", "pale_skin", "shortness_of_breath", "dizziness"]
     };
 
     if (diagnosisResults.length === 1 && typeof diagnosisResults[0] === "string") {
         const diseaseName = diagnosisResults[0];
         if (diseaseSymptomsMap[diseaseName]) {
             diagnosisResults = diseaseSymptomsMap[diseaseName];
+            chosenDisease = diseaseName;
+            localStorage.setItem("chosenDisease", JSON.stringify(chosenDisease)); // Ensure it's stored properly
             console.log("Loaded symptoms for disease:", diagnosisResults);
         }
-    }
+    }    
 
     // Convert diagnosisResults into a Set for easier lookup
     const diagnosisSymptoms = new Set(diagnosisResults);
 
+    // TODO: localStorage is not working here, it's not showing the selected disease but it's fetching it.
     // Show the chosen disease at the top
-    const diseaseHeader = document.createElement("h2");
-    diseaseHeader.textContent = `Diagnosis: ${chosenDisease}`;
-    diseaseContainer.appendChild(diseaseHeader);
+    diseaseContainer.innerHTML = `<h2>Diagnosis: ${chosenDisease}</h2>`;
 
     // Sort symptoms: Selected symptoms first, then diagnosis symptoms
     allSymptoms.sort((a, b) => {
@@ -82,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Add diagnosis label if symptom is part of the diagnosis results
         if (diagnosisSymptoms.has(symptom) && !selectedSymptoms.has(symptom)) {
             const diagnosisLabel = document.createElement("span");
-            diagnosisLabel.textContent = "Possible Other Symptom";
+            diagnosisLabel.textContent = "Suggested by Diagnosis";
             diagnosisLabel.classList.add("diagnosis-label");
             symptomDiv.appendChild(diagnosisLabel);
         }
