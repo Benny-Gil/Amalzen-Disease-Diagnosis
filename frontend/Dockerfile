@@ -16,5 +16,7 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 3000
 
+ENV CHOKIDAR_USEPOLLING=true
+
 # Start the application
 CMD ["sh", "-c", "if [ \"$NODE_ENV\" = \"development\" ]; then npm run dev; else npm start; fi"]
