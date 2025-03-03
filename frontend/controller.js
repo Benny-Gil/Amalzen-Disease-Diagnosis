@@ -3,7 +3,7 @@ const path = require('path')
 
 function controller(publicDir){
     return (req,res) =>{
-        res.sendFile((path.join(publicDir,"index.html")))
+        res.sendFile((path.join(publicDir,"views", "symptoms_selection.html")))
     }
 }
 

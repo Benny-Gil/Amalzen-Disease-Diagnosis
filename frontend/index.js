@@ -24,6 +24,10 @@ app.get('/symptom_selection', (req,res)=>{
     res.sendFile(path.join(publicDir,'views','symptoms_selection.html'))
 })
 
+app.get('/possible_diseases', (req,res)=>{
+    res.sendFile(path.join(publicDir,'views','possible_diseases.html'))
+})
+
 
 app.listen(8080, () => {
     console.log("Running on port 8080")
