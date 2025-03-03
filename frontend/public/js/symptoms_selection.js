@@ -1,5 +1,6 @@
 let selectedSymptoms = [];
 const maxSymptoms = 5;
+let allSymptoms = []; // Store all symptoms for filtering
 
 const symptomimgs = {
     abdominal_bloating: "imgs/abdominal_bloating.jpg",
@@ -79,46 +80,132 @@ const symptomimgs = {
 
 async function fetchSymptoms() {
     try {
+        // Show a loading indicator
+        const container = document.getElementById("symptoms-list");
+        container.innerHTML = '<div class="loader">Loading symptoms...</div>';
+        
+        // 1. Fetch all symptoms first
         const response = await fetch('http://localhost/api/symptoms');
         const symptoms = await response.json();
-        const container = document.getElementById("symptoms-list");
-
-        symptoms.forEach(symptom => {
-            const div = document.createElement("div");
-            div.classList.add("symptom");
-            
-            // Convert snake_case to Sentence case
-            const formattedSymptom = symptom
-                .replace(/_/g, ' ')
-                .replace(/\b\w/g, char => char.toUpperCase());
-            
-            // Create text node for the formatted symptom name
-            const textNode = document.createElement("div");
-            textNode.textContent = formattedSymptom;
-            textNode.classList.add("symptom-name");
-            
-            // Add image
-            const img = document.createElement("img");
-            img.src = symptomimgs[symptom] ? symptomimgs[symptom] : "imgs/default.jpg";
-            img.alt = formattedSymptom;
-            img.classList.add("symptom-img");
-            
-            // Append elements in correct order
-            div.appendChild(textNode);
-            div.appendChild(img);
-
-            div.addEventListener("click", function () {
-                if (selectedSymptoms.length < maxSymptoms && !selectedSymptoms.includes(symptom)) {
-                    selectedSymptoms.push(symptom);
-                    updateSelectedSymptoms();
-                }
-            });
-
-            container.appendChild(div);
-        });
+        
+        // Store all symptoms for search functionality
+        allSymptoms = symptoms;
+        
+        // 2. Preload all images before displaying anything
+        await preloadImages(symptoms);
+        
+        // 3. Display symptoms
+        displaySymptoms(symptoms);
+        
     } catch (error) {
         console.error("Error fetching symptoms:", error);
+        const container = document.getElementById("symptoms-list");
+        container.innerHTML = '<div class="error">Failed to load symptoms. Please try again later.</div>';
     }
+}
+
+// Function to display symptoms
+function displaySymptoms(symptoms) {
+    const container = document.getElementById("symptoms-list");
+    container.innerHTML = '';
+    
+    if (symptoms.length === 0) {
+        container.innerHTML = '<div class="no-results">No symptoms match your search</div>';
+        return;
+    }
+    
+    symptoms.forEach(symptom => {
+        const div = document.createElement("div");
+        div.classList.add("symptom");
+        
+        // Convert snake_case to Sentence case
+        const formattedSymptom = symptom
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, char => char.toUpperCase());
+        
+        // Create text node for the formatted symptom name
+        const textNode = document.createElement("div");
+        textNode.textContent = formattedSymptom;
+        textNode.classList.add("symptom-name");
+        
+        // Add image (already preloaded)
+        const img = document.createElement("img");
+        img.src = symptomimgs[symptom] ? symptomimgs[symptom] : "imgs/default.jpg";
+        img.alt = formattedSymptom;
+        img.classList.add("symptom-img");
+        
+        // Append elements in correct order
+        div.appendChild(textNode);
+        div.appendChild(img);
+
+        div.addEventListener("click", function () {
+            if (selectedSymptoms.length < maxSymptoms && !selectedSymptoms.includes(symptom)) {
+                selectedSymptoms.push(symptom);
+                updateSelectedSymptoms();
+            }
+        });
+
+        container.appendChild(div);
+    });
+}
+
+// Search functionality
+function setupSearch() {
+    const searchInput = document.getElementById("search-input");
+    
+    searchInput.addEventListener("input", function() {
+        const searchTerm = this.value.toLowerCase();
+                
+        // Filter symptoms based on search term
+        const filteredSymptoms = allSymptoms.filter(symptom => {
+            const formattedSymptom = symptom.replace(/_/g, ' ');
+            return formattedSymptom.toLowerCase().includes(searchTerm);
+        });
+        
+        console.log("Found matches:", filteredSymptoms.length);
+        // Display filtered symptoms
+        displaySymptoms(filteredSymptoms);
+    });
+}
+
+// Helper function to preload images
+function preloadImages(symptoms) {
+    return new Promise((resolve) => {
+        let loadedCount = 0;
+        const totalImages = symptoms.length;
+        const container = document.getElementById("symptoms-list");
+        
+        // Update the loading indicator with progress
+        function updateProgress() {
+            const percent = Math.round((loadedCount / totalImages) * 100);
+            container.innerHTML = `<div class="loader">Loading images... ${percent}%</div>`;
+        }
+        
+        // If there are no symptoms, resolve immediately
+        if (totalImages === 0) {
+            resolve();
+            return;
+        }
+        
+        // Preload each image
+        symptoms.forEach(symptom => {
+            const imgSrc = symptomimgs[symptom] ? symptomimgs[symptom] : "imgs/default.jpg";
+            const img = new Image();
+            
+            img.onload = img.onerror = () => {
+                loadedCount++;
+                updateProgress();
+                
+                // If all images are loaded, resolve the promise
+                if (loadedCount === totalImages) {
+                    resolve();
+                }
+            };
+            
+            // Start loading the image
+            img.src = imgSrc;
+        });
+    });
 }
 
 function updateSelectedSymptoms() {
@@ -175,5 +262,33 @@ document.getElementById("submit-btn").addEventListener("click", async function (
     }
 });
 
-
-fetchSymptoms();
+// Initialize the app
+document.addEventListener("DOMContentLoaded", function() {
+    fetchSymptoms();
+    setupSearch();
+    
+    document.getElementById("clear-btn").addEventListener("click", function () {
+        selectedSymptoms = [];
+        updateSelectedSymptoms();
+    });
+    
+    document.getElementById("submit-btn").addEventListener("click", async function () {
+        if (selectedSymptoms.length === 0) return alert("Please select at least one symptom!");
+    
+        try {
+            const response = await fetch(`http://localhost/api/diagnose?symptoms=${selectedSymptoms.join(",")}`);
+            const diseases = await response.json();
+    
+            localStorage.setItem("selectedSymptoms", JSON.stringify(selectedSymptoms));
+            localStorage.setItem("diagnosisResults", JSON.stringify(diseases));
+    
+            console.log("Selected Symptoms:", JSON.stringify(selectedSymptoms));
+            console.log("Diagnosis Results:", JSON.stringify(diseases));
+    
+            window.location.href = "/possible_diseases";
+        } catch (error) {
+            console.error("Error fetching diagnosis results:", error);
+            alert("Failed to fetch diagnosis results. Please try again later.");
+        }
+    });
+});
