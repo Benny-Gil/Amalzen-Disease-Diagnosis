@@ -100,3 +100,33 @@ button:hover {
     background-color: #b8e5cf;
     transform: translateY(-2px);
 }
+
+footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.disclaimer {
+    width: 90%;
+    max-width: 1800px;
+    margin: auto;
+    padding: 15px;
+    background-color: #518073;
+    border-radius: 8px;
+}
+
+.disclaimer h3 {
+    color: #d9f2e6;
+    margin-bottom: 15px;
+}
+
+.disclaimer p {
+    font-family: Arial, sans-serif;
+    text-align: justify;
+    font-size: 16px;
+    font-weight: lighter;
+    margin-bottom: 10px;
+    color: white;
+}
