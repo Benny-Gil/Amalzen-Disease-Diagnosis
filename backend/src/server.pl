@@ -6,7 +6,7 @@
 :- use_module(logic).  % Import diagnosis logic
 
 :- use_module(json_injector). % Imported the json_injector module
-:- use_module(disease_kb).  % Imported the disease_kb module
+:- use_module('knowledge.pl').  % Imported the disease_kb module
 
 % Define HTTP handlers
 :- http_handler(root(diagnose), diagnose_handler, []).
@@ -62,5 +62,3 @@ diseases_handler(_) :-
             ),
             Diseases),
     reply_json(Diseases).
-
-:- start_server.
